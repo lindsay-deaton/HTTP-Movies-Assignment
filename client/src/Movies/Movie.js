@@ -23,17 +23,16 @@ function Movie({ addToSavedList, setMovieList, movieList }) {
     push(`/update-movie/${params.id}`)
   }
 
-  const deleteMovie = (id) => {
-    axios.delete(`http://localhost:5000/api/movies/${id}`)
+  const deleteMovie = () => {
+    axios.delete(`http://localhost:5000/api/movies/${params.id}`)
       .then(res => {
         console.log(res.data)
         const movies = [...movieList];
         setMovieList(movies.filter(movie => {
-          return movie.id !== res.data ?
+          return movie.id !== res.data
             //params.id is checking the url
-            setMovieList(movie) : ""
         }))
-          push('/movies')
+        push('/')
       })
       .catch(err => {
       console.log(err)

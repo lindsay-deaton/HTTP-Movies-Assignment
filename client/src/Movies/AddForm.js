@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import axios from "axios";
-import MovieList from "./MovieList";
 
 const initialMovie = {
   title: "",
@@ -10,24 +9,13 @@ const initialMovie = {
   stars: [],
 };
 
-const UpdateForm = props => {
+const AddForm = props => {
   const { push } = useHistory();
   const [movie, setMovie] = useState(initialMovie);
   const { id } = useParams();
   const { setMovieList, movieList } = props;
 
-  useEffect(()=>{
-    axios
-      .get(`http://localhost:5000/api/movies/${id}`)
-      .then(res=>{
-        setMovie(res.data);
-      })
-      .catch(err=>{
-        console.log(err);
-      });
-  }, []);
-
-const changeHandler = e => {
+  const changeHandler = e => {
     e.persist();
     let value = e.target.value;
     if (e.target.name === "metascore") {
@@ -41,17 +29,21 @@ const changeHandler = e => {
   };
 
   const handleSubmit = e => {
-    //updatemovies on the list
+    //addMovies on the list
+    const multiStars = movie.stars.split(', ')
+    const movieToAdd = {
+      ...movie,
+      title: movie.title,
+      director: movie.director,
+      metascore: movie.metascore,
+      stars: multiStars,
+    }
     e.preventDefault();
     axios
-      .put(`http://localhost:5000/api/movies/${id}`, movie)
+      .post(`http://localhost:5000/api/movies`, movieToAdd)
       .then(res => {
-        const movies = [...movieList];
-        setMovieList(movies.map(movie => {
-          return movie.id !== parseInt(id, 10)
-            ? movie 
-            :res.data
-        }));
+        console.log(res)
+        setMovieList(res.data)
         push("/");
       })
       .catch(err=>{
@@ -61,7 +53,7 @@ const changeHandler = e => {
 
   return (
     <div>
-      <h2>Update Movie</h2>
+      <h2>Add Movie</h2>
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -96,10 +88,10 @@ const changeHandler = e => {
           value={movie.stars}
         />
 
-        <button className="md-button form-button">Update</button>
+        <button className="md-button form-button">Add</button>
       </form>
     </div>
   );
 };
 
-export default UpdateForm;
+export default AddForm;
